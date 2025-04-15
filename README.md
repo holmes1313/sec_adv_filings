@@ -15,8 +15,8 @@ This repository houses a Python-based project to **parse, transform, analyze**, 
 
 ## TODO
 
-- The parser took the most time and **is still not 100% complete**.
-- Need to **add logic to parse multiple choice selections and tables** from PDF files (e.g., client types, asset breakdown).
+- The parser took the most time.
+- Need to **add and refactor logic to parse multiple choice selections and tables** from PDF files (e.g., client types, asset breakdown).
 - Improve **scalability and performance** to handle large datasets (multi-firm, multi-file environments).
 - Expand automated testing coverage and CI integration.
 
