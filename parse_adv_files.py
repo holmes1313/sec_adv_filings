@@ -17,8 +17,13 @@ from sqlalchemy import create_engine
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
+#pd.set_option('display.width', None)
+
 # Set the working date
-WorkingDate = datetime(2025, 4, 6)
+WorkingDate = datetime(2025, 4, 24)
 url = f"https://reports.adviserinfo.sec.gov/reports/CompilationReports/IA_FIRM_SEC_Feed_{WorkingDate:%m_%d_%Y}.xml.gz"
 response = requests.get(url)
 
@@ -141,24 +146,27 @@ def parse_pdf(pdf_file, save_dir="source_pdf"):
         })
     return results
 
-# --- Process and Merge ---
-master_df = pd.DataFrame()
-for crd in target_firmCrdNbs:
-    pdf_file = f"{crd}.pdf"
-    parsed_data = parse_pdf(pdf_file)
-    df_parsed = pd.DataFrame(parsed_data)
-    master_df = pd.concat([master_df, df_parsed], ignore_index=True)
+process_data = False
+if process_data:
+    # --- Process and Merge ---
+    master_df = pd.DataFrame()
+    for crd in target_firmCrdNbs:
+        pdf_file = f"{crd}.pdf"
+        parsed_data = parse_pdf(pdf_file)
+        df_parsed = pd.DataFrame(parsed_data)
+        master_df = pd.concat([master_df, df_parsed], ignore_index=True)
 
-merged_df = pd.merge(master_df, df, on="FirmCrdNb", how="left")
-merged_df.to_csv('merged_data.csv', index=False)
-print("Merged DataFrame written to 'merged_data.csv'")
+    merged_df = pd.merge(master_df, df, on="FirmCrdNb", how="left")
+    print(merged_df.shape)
+    merged_df.to_csv('merged_data.csv', index=False)
+    print("Merged DataFrame written to 'merged_data.csv'")
 
-# --- Save to SQLite ---
-engine = create_engine("sqlite:///private_funds.db")
-merged_df.to_sql("private_fund_data", engine, if_exists="append", index=False)
+    # --- Save to SQLite ---
+    engine = create_engine("sqlite:///private_funds.db")
+    merged_df.to_sql("private_fund_data", engine, if_exists="append", index=False)
 
-with engine.connect() as conn:
-    result = pd.read_sql("SELECT * FROM private_fund_data", conn)
-    print(result.head())
+    with engine.connect() as conn:
+        result = pd.read_sql("SELECT * FROM private_fund_data", conn)
+        print(result.head())
 
 print("data ingestion completed")

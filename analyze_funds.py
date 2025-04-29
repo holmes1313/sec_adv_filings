@@ -3,6 +3,10 @@ import pandas as pd
 import sqlite3
 import matplotlib.pyplot as plt
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_colwidth', None)
+
 # --- Load Data from SQLite ---
 conn = sqlite3.connect("private_funds.db")
 df = pd.read_sql("SELECT distinct * FROM private_fund_data", conn)
@@ -19,16 +23,16 @@ top_funds = df.sort_values(by='Gross Asset Value', ascending=False).head(5)
 print("Top 5 Private Funds by Gross Asset Value:")
 print(top_funds[['Private Fund Name', 'Gross Asset Value']])
 
-# --- Plot: Top 5 Private Funds by Gross Asset Value ---
-os.makedirs("visualization", exist_ok=True)
-plt.figure(figsize=(10, 6))
-plt.barh(top_funds["Private Fund Name"], top_funds["Gross Asset Value"])
-plt.xlabel("Gross Asset Value")
-plt.title("Top 5 Private Funds by Gross Asset Value")
-plt.gca().invert_yaxis()
-plt.tight_layout()
-plt.savefig("visualization/top_5_funds.png")
-plt.show()
+# # --- Plot: Top 5 Private Funds by Gross Asset Value ---
+# os.makedirs("visualization", exist_ok=True)
+# plt.figure(figsize=(10, 6))
+# plt.barh(top_funds["Private Fund Name"], top_funds["Gross Asset Value"])
+# plt.xlabel("Gross Asset Value")
+# plt.title("Top 5 Private Funds by Gross Asset Value")
+# plt.gca().invert_yaxis()
+# plt.tight_layout()
+# plt.savefig("visualization/top_5_funds.png")
+# plt.show()
 
 # --- Average Fund Value by Firm ---
 avg_per_firm = df.groupby('FirmCrdNb')['Gross Asset Value'].mean().reset_index()

@@ -43,6 +43,10 @@ def query_db(query: str, params: tuple = ()):
     return rows
 
 # Endpoints
+@app.get("/")
+def read_root():
+    return {"message": "FastAPI server is running."}
+
 @app.get("/funds/{firm_crd}", response_model=List[PrivateFund])
 def get_funds_by_firm(firm_crd: int):
     rows = query_db(
